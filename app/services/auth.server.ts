@@ -1,10 +1,16 @@
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
+import { db, users } from '~/db';
+import { eq } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
 
 // Define your user type
 interface User {
-  email: string;
   id: string;
+  email: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Create an instance of the authenticator
@@ -24,15 +30,44 @@ authenticator.use(
       throw new Error('Invalid form data');
     }
 
-    // This is where you would validate the password against your database
-    if (email === 'test@example.com' && password === 'password') {
-      return {
-        id: '1',
-        email,
-      };
+    const user = await verifyLogin(email, password);
+    if (!user) {
+      throw new Error('Invalid credentials');
     }
 
-    throw new Error('Invalid credentials');
+    return user;
   }),
   'user-pass'
 ); 
+
+export async function createUser(email: string, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
+  try {
+    const [user] = await db.insert(users)
+      .values({
+        email,
+        password: hashedPassword,
+      })
+      .returning();
+    
+    return user;
+  } catch (error) {
+    // Handle unique constraint violations or other errors
+    throw new Error('Error creating user');
+  }
+}
+
+export async function verifyLogin(email: string, password: string) {
+  const [user] = await db.select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  if (!user) return null;
+
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) return null;
+
+  return user;
+} 

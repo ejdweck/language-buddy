@@ -1,23 +1,34 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { useEffect } from 'react'
 
-export function TiptapEditor() {
+interface TiptapEditorProps {
+  initialContent?: any
+  onChange?: (content: any) => void
+}
+
+export function TiptapEditor({ initialContent, onChange }: TiptapEditorProps) {
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-    ],
-    content: '<p>Start writing...</p>',
+    extensions: [StarterKit],
+    content: initialContent || '<p>Start writing...</p>',
+    editable: true,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none'
-      }
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[200px]',
+      },
     },
-    immediatelyRender: false
+    onUpdate: ({ editor }) => {
+      onChange?.(editor.getJSON())
+    },
   })
 
-  return (
-    <div className="min-h-[300px] w-full max-w-4xl mx-auto p-4">
-      <EditorContent editor={editor} className="min-h-[300px] w-full border rounded-lg p-4" />
-    </div>
-  )
+  useEffect(() => {
+    if (editor && initialContent && !editor.isDestroyed) {
+      editor.commands.setContent(initialContent)
+    }
+  }, [editor, initialContent])
+
+  return <div className="border rounded-lg p-4">
+    <EditorContent editor={editor} />
+  </div>
 } 

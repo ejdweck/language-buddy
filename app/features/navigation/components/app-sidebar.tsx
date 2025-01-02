@@ -2,19 +2,14 @@ import * as React from 'react';
 import {
   LayoutDashboard,
   Settings,
-  Users,
-  FileText,
-  BarChart3,
   Notebook,
   Command,
   GalleryVerticalEnd,
   AudioWaveform,
 } from 'lucide-react';
-
 import { NavMain } from './nav-main';
-import { NavProjects } from './nav-projects';
 import { NavUser } from './nav-user';
-import { TeamSwitcher } from '~/features/navigation/components/team-switcher';
+import { TeamSwitcher } from './team-switcher';
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +17,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '~/components/ui/sidebar';
+import { useLocation } from '@remix-run/react';
+import type { MonthGroup } from '~/features/notebook/types';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userData: {
@@ -29,26 +26,30 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     email: string;
     avatar: string;
   };
+  notebookEntries?: MonthGroup[];
 }
 
-export function AppSidebar({ userData, ...props }: AppSidebarProps) {
+export function AppSidebar({ userData, notebookEntries, ...props }: AppSidebarProps) {
+  const location = useLocation();
+  const [isNotebookOpen, setIsNotebookOpen] = React.useState(true);
+
   const data = {
     user: userData,
     teams: [
       {
         name: 'English',
         logo: GalleryVerticalEnd,
-        // plan: '',
+        plan: 'Active',
       },
       {
         name: 'Hebrew',
         logo: AudioWaveform,
-        // plan: 'Startup',
+        plan: 'Learning',
       },
       {
         name: 'Spanish',
         logo: Command,
-        // plan: 'Free',
+        plan: 'New',
       },
     ],
     navMain: [
@@ -56,39 +57,36 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
         title: 'Dashboard',
         url: '/dashboard',
         icon: LayoutDashboard,
-        isActive: true,
-      },
-    //   {
-    //     title: 'Analytics',
-    //     url: '/dashboard/analytics',
-    //     icon: BarChart3,
-    //   },
-    //   {
-    //     title: 'Users',
-    //     url: '/dashboard/users',
-    //     icon: Users,
-    //   },
-    //   {
-    //     title: 'Documents',
-    //     url: '/dashboard/documents',
-    //     icon: FileText,
-    //   },
-      {
-        title: 'Notebook',
-        url: '/dashboard/notebook',
-        icon: Notebook,
+        isActive: location.pathname === '/dashboard',
       },
       {
         title: 'Settings',
         url: '/dashboard/settings',
         icon: Settings,
+        isActive: location.pathname.startsWith('/dashboard/settings'),
+      },
+      {
+        title: 'Notebook',
+        url: '/dashboard/notebook',
+        icon: Notebook,
+        isActive: location.pathname.startsWith('/dashboard/notebook'),
+        isExpandable: true,
+        isExpanded: isNotebookOpen,
+        onExpandClick: () => setIsNotebookOpen(!isNotebookOpen),
+        items: notebookEntries?.map((monthGroup) => ({
+          title: monthGroup.month,
+          items: monthGroup.entries.map((entry) => ({
+            title: entry.title,
+            url: `/dashboard/notebook/${entry.id}`,
+            isActive: location.pathname === `/dashboard/notebook/${entry.id}`,
+          })),
+        })),
       },
     ],
- 
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" defaultCollapsed={false} {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>

@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core';
+import { createId } from '@paralleldrive/cuid2';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -8,6 +9,30 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Add type inference helper
+export const notebooks = pgTable('notebooks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  name: text('name').notNull(),
+  language: text('language').default('en').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const notebookEntries = pgTable('notebook_entries', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  notebookId: uuid('notebook_id').notNull().references(() => notebooks.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  title: text('title').notNull(),
+  content: jsonb('content').notNull(), // Store Tiptap JSON content
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Type inference helpers
 export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert; 
+export type NewUser = typeof users.$inferInsert;
+export type Notebook = typeof notebooks.$inferSelect;
+export type NewNotebook = typeof notebooks.$inferInsert;
+export type NotebookEntry = typeof notebookEntries.$inferSelect;
+export type NewNotebookEntry = typeof notebookEntries.$inferInsert; 

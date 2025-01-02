@@ -3,6 +3,8 @@ import { FormStrategy } from 'remix-auth-form';
 import { db, users } from '~/db';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { redirect } from '@remix-run/node';
+import { sessionStorage } from '~/utils/session.server';
 
 // Define your user type
 interface User {
@@ -70,4 +72,15 @@ export async function verifyLogin(email: string, password: string) {
   if (!isValid) return null;
 
   return user;
-} 
+}
+
+export async function requireUserId(request: Request) {
+  const session = await sessionStorage.getSession(request.headers.get('Cookie'));
+  const user = session.get('user');
+
+  if (!user?.id) {
+    throw redirect('/login');
+  }
+
+  return user.id;
+}

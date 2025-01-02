@@ -1,7 +1,21 @@
-export interface Note {
+import type { JSONContent } from '@tiptap/react';
+
+export interface NotebookEntry {
   id: string;
-  content: string;
+  title: string;
+  content: JSONContent;
   createdAt: Date;
   updatedAt: Date;
-  userId: string;
+}
+
+export interface NotebookSidebarItem {
+  id: string;
+  title: string;
+  createdAt: Date;
+  isActive?: boolean;
+}
+
+export interface MonthGroup {
+  month: string;
+  entries: NotebookSidebarItem[];
 } 

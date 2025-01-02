@@ -11,6 +11,6 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 }
 
-export function loader() {
+export async function loader() {
   return redirect('/login');
 } 

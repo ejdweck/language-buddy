@@ -14,6 +14,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '~/components/ui/sidebar';
+import { Link } from '@remix-run/react';
 
 interface NavMainProps {
   items: {
@@ -64,6 +65,12 @@ export function NavMain({ items }: NavMainProps) {
           </Collapsible>
         ))}
       </SidebarMenu>
+      <Link 
+        to="/dashboard/notebook" 
+        className="text-gray-600 hover:text-gray-900"
+      >
+        Notebook
+      </Link>
     </SidebarGroup>
   );
 } 

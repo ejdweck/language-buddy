@@ -1,7 +1,7 @@
 import {  redirect } from '@remix-run/node';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { useActionData } from '@remix-run/react';
-import { LoginForm } from '~/components/login-form';
+import { LoginForm } from '~/features/auth/components/login-form';
 import { authenticator } from '~/services/auth.server';
 import { sessionStorage } from '~/utils/session.server';
 
@@ -16,7 +16,7 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     const user = await authenticator.authenticate('user-pass', request);
     const session = await sessionStorage.getSession(request.headers.get('cookie'));
-    session.set('user', user);
+    session.set('userId', user.id);
     return redirect('/dashboard', {
       headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
     });

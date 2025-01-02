@@ -21,6 +21,10 @@ import {
   BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb';
 
+type RouteHandle = {
+  breadcrumb?: () => React.ReactNode;
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await sessionStorage.getSession(request.headers.get('cookie'));
   const user = session.get('user');
@@ -40,7 +44,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function DashboardLayout() {
   const { user } = useLoaderData<typeof loader>();
   const matches = useMatches();
-  const match = matches[matches.length - 1];
+  const match = matches[matches.length - 1] as { handle: RouteHandle };
   
   return (
     <SidebarProvider>

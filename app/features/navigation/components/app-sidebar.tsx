@@ -5,6 +5,7 @@ import {
   Users,
   FileText,
   BarChart3,
+  Notebook,
   Command,
   GalleryVerticalEnd,
   AudioWaveform,
@@ -35,19 +36,19 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
     user: userData,
     teams: [
       {
-        name: 'Acme Inc',
+        name: 'English',
         logo: GalleryVerticalEnd,
-        plan: 'Enterprise',
+        // plan: '',
       },
       {
-        name: 'Acme Corp.',
+        name: 'Hebrew',
         logo: AudioWaveform,
-        plan: 'Startup',
+        // plan: 'Startup',
       },
       {
-        name: 'Evil Corp.',
+        name: 'Spanish',
         logo: Command,
-        plan: 'Free',
+        // plan: 'Free',
       },
     ],
     navMain: [
@@ -57,20 +58,25 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
         icon: LayoutDashboard,
         isActive: true,
       },
+    //   {
+    //     title: 'Analytics',
+    //     url: '/dashboard/analytics',
+    //     icon: BarChart3,
+    //   },
+    //   {
+    //     title: 'Users',
+    //     url: '/dashboard/users',
+    //     icon: Users,
+    //   },
+    //   {
+    //     title: 'Documents',
+    //     url: '/dashboard/documents',
+    //     icon: FileText,
+    //   },
       {
-        title: 'Analytics',
-        url: '/dashboard/analytics',
-        icon: BarChart3,
-      },
-      {
-        title: 'Users',
-        url: '/dashboard/users',
-        icon: Users,
-      },
-      {
-        title: 'Documents',
-        url: '/dashboard/documents',
-        icon: FileText,
+        title: 'Notebook',
+        url: '/dashboard/notebook',
+        icon: Notebook,
       },
       {
         title: 'Settings',
@@ -78,23 +84,7 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
         icon: Settings,
       },
     ],
-    projects: [
-      {
-        name: 'Design Engineering',
-        url: '/projects/design',
-        icon: LayoutDashboard,
-      },
-      {
-        name: 'Sales & Marketing',
-        url: '/projects/sales',
-        icon: BarChart3,
-      },
-      {
-        name: 'Travel',
-        url: '/projects/travel',
-        icon: Users,
-      },
-    ],
+ 
   };
 
   return (
@@ -104,7 +94,6 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

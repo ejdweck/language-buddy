@@ -16,20 +16,16 @@ interface User {
 }
 
 // Create an instance of the authenticator
-export const authenticator = new Authenticator<User>();
+export const authenticator = new Authenticator<User>(sessionStorage);
 
 // Register the Form Strategy
 authenticator.use(
   new FormStrategy(async ({ form }) => {
-    const email = form.get('email');
-    const password = form.get('password');
+    const email = form.get('email')?.toString();
+    const password = form.get('password')?.toString();
 
     if (!email || !password) {
-      throw new Error('Invalid credentials');
-    }
-
-    if (typeof email !== 'string' || typeof password !== 'string') {
-      throw new Error('Invalid form data');
+      throw new Error('Email and password are required');
     }
 
     const user = await verifyLogin(email, password);
@@ -37,7 +33,9 @@ authenticator.use(
       throw new Error('Invalid credentials');
     }
 
-    return user;
+    // Don't include the password in the session
+    const { password: _password, ...userWithoutPassword } = user;
+    return userWithoutPassword as User;
   }),
   'user-pass'
 ); 

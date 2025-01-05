@@ -1,7 +1,7 @@
-import {  redirect } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { useActionData } from '@remix-run/react';
-import { LoginForm } from '~/features/auth/components/login-form';
+import { LoginForm } from '~/components/auth/login-form';
 import { authenticator } from '~/services/auth.server';
 import { sessionStorage } from '~/utils/session.server';
 
@@ -14,16 +14,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
+    const formData = await request.clone().formData();
+    console.log('Form submission:', {
+      email: formData.get('email'),
+      hasPassword: !!formData.get('password'),
+    });
+
     const user = await authenticator.authenticate('user-pass', request);
+    console.log('Authenticated user:', user);
+
     const session = await sessionStorage.getSession(request.headers.get('cookie'));
-    session.set('userId', user.id);
+    session.set('user', user);
+
     return redirect('/dashboard', {
-      headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
+      headers: {
+        'Set-Cookie': await sessionStorage.commitSession(session),
+      },
     });
   } catch (error) {
-    return Response.json(
+    console.error('Login error:', error);
+    return json(
       { error: 'Invalid email or password' },
-      { status: 400 }
+      { status: 401 }
     );
   }
 }

@@ -8,7 +8,7 @@ import {
   AudioWaveform,
 } from 'lucide-react';
 import { NavMain } from './nav-main';
-import { NavUser } from './nav-user';
+import { NavUser } from '~/components/navigation/nav-user';
 import { TeamSwitcher } from './team-switcher';
 import {
   Sidebar,
@@ -18,7 +18,7 @@ import {
   SidebarRail,
 } from '~/components/ui/sidebar';
 import { useLocation } from '@remix-run/react';
-import type { MonthGroup } from '~/features/notebook/types';
+import type { MonthGroup } from '~/types/notebook';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userData: {

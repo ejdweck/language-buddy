@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core';
-import { createId } from '@paralleldrive/cuid2';
+import type { TiptapContent } from '~/types/notebook';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -24,7 +24,10 @@ export const notebookEntries = pgTable('notebook_entries', {
   notebookId: uuid('notebook_id').notNull().references(() => notebooks.id),
   userId: uuid('user_id').notNull().references(() => users.id),
   title: text('title').notNull(),
-  content: jsonb('content').notNull(), // Store Tiptap JSON content
+  content: jsonb('content').$type<TiptapContent>().notNull().default({
+    type: 'doc',
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: '' }] }]
+  }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

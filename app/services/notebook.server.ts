@@ -3,7 +3,7 @@ import { notebooks, notebookEntries, type NewNotebookEntry } from '~/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { json } from '@remix-run/node';
 import { format } from 'date-fns';
-import { NotebookSidebarItem } from '~/features/notebook/types';
+import { NotebookSidebarItem, TiptapContent } from '~/features/notebook/types';
 
 export async function getOrCreateNotebook(userId: string) {
   // First try to find existing notebook
@@ -32,13 +32,13 @@ export async function getOrCreateNotebook(userId: string) {
 export async function saveNotebookEntry({
   userId,
   notebookId,
-  title,
+  title = 'Untitled',
   content,
 }: {
   userId: string;
   notebookId: string;
-  title: string;
-  content: any;
+  title?: string;
+  content: TiptapContent;
 }) {
   try {
     const [entry] = await db
@@ -46,7 +46,7 @@ export async function saveNotebookEntry({
       .values({
         userId,
         notebookId,
-        title,
+        title: title.slice(0, 50),
         content,
       })
       .returning();
@@ -66,7 +66,7 @@ export async function updateNotebookEntry({
 }: {
   id: string;
   userId: string;
-  content: any;
+  content: TiptapContent;
   title: string;
 }) {
   try {
@@ -119,7 +119,7 @@ export async function getNotebookEntriesByMonth(notebookId: string) {
     }
     acc[monthKey].push({
       id: entry.id,
-      title: entry.title,
+      title: entry.title || 'Untitled',
       createdAt: new Date(entry.createdAt),
     });
     return acc;
@@ -127,6 +127,31 @@ export async function getNotebookEntriesByMonth(notebookId: string) {
 
   return Object.entries(entriesByMonth).map(([month, entries]) => ({
     month,
-    entries,
+    entries: entries.map(entry => ({
+      ...entry,
+      title: entry.title || 'Untitled'
+    })),
   }));
+}
+
+export async function getNotebookEntry(id: string, userId: string) {
+  return await db.query.notebookEntries.findFirst({
+    where: and(
+      eq(notebookEntries.id, id),
+      eq(notebookEntries.userId, userId)
+    ),
+  });
+}
+
+export async function deleteNotebookEntry(id: string, userId: string) {
+  try {
+    await db
+      .delete(notebookEntries)
+      .where(and(eq(notebookEntries.id, id), eq(notebookEntries.userId, userId)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting notebook entry:', error);
+    throw json({ success: false, error: 'Failed to delete entry' }, { status: 500 });
+  }
 } 

@@ -31,7 +31,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ userData, notebookEntries, ...props }: AppSidebarProps) {
   const location = useLocation();
-  const [isNotebookOpen, setIsNotebookOpen] = React.useState(true);
 
   const data = {
     user: userData,
@@ -60,33 +59,22 @@ export function AppSidebar({ userData, notebookEntries, ...props }: AppSidebarPr
         isActive: location.pathname === '/dashboard',
       },
       {
+        title: 'Notebook',
+        url: '/dashboard/notebook',
+        icon: Notebook,
+        isActive: location.pathname.startsWith('/dashboard/notebook'),
+      },
+      {
         title: 'Settings',
         url: '/dashboard/settings',
         icon: Settings,
         isActive: location.pathname.startsWith('/dashboard/settings'),
       },
-      {
-        title: 'Notebook',
-        url: '/dashboard/notebook',
-        icon: Notebook,
-        isActive: location.pathname.startsWith('/dashboard/notebook'),
-        isExpandable: true,
-        isExpanded: isNotebookOpen,
-        onExpandClick: () => setIsNotebookOpen(!isNotebookOpen),
-        items: notebookEntries?.map((monthGroup) => ({
-          title: monthGroup.month,
-          items: monthGroup.entries.map((entry) => ({
-            title: entry.title,
-            url: `/dashboard/notebook/${entry.id}`,
-            isActive: location.pathname === `/dashboard/notebook/${entry.id}`,
-          })),
-        })),
-      },
     ],
   };
 
   return (
-    <Sidebar collapsible="icon" defaultCollapsed={false} {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>

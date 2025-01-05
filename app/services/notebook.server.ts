@@ -154,4 +154,21 @@ export async function deleteNotebookEntry(id: string, userId: string) {
     console.error('Error deleting notebook entry:', error);
     throw json({ success: false, error: 'Failed to delete entry' }, { status: 500 });
   }
+}
+
+export async function createNotebookEntry(
+  notebookId: string, 
+  userId: string,
+  data: { title: string; content: TiptapContent }
+) {
+  const [entry] = await db.insert(notebookEntries).values({
+    notebookId,
+    userId,
+    title: data.title,
+    content: data.content,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }).returning();
+
+  return entry;
 } 

@@ -96,7 +96,7 @@ export default function NotebookEntryPage() {
       formData,
       { 
         method: 'POST',
-        action: `/dashboard/notebook/${entry.id}`
+        action: `/dashboard/entry/${entry.id}`
       }
     );
   };

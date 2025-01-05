@@ -1,9 +1,13 @@
+export interface NotebookEntry {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface MonthGroup {
   month: string;
-  entries: {
-    id: string;
-    title: string;
-  }[];
+  entries: NotebookEntry[];
 }
 
 export interface TiptapContent {
